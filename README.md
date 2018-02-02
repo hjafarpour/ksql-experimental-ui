@@ -2,12 +2,13 @@
 
 # ![KSQL rocket](ksq-lrocket.png) KSQL Experimental UI
 
-> **Important:** This release is an **experimental ui** and is free and open-source from Confluent under the Apache 2.0 license. 
 
-> Do not run the KSQL-UI against a production KSQL deployment.*
+This project is an experimental UI for [KSQL](https://github.com/confluentinc/ksql).  The goal is to provide a simple visual wrapper for KSQL’s CLI.  The experimental UI is meant to be used for local development and testing and for demoing KSQL. 
+ 
+ >If you want to use KSQL in production environments, we recommend the use of KSQL’s CLI.
 
 
-The KSQL Experimental UI release artifact is pulled from github/release into KSQL as part of the project packaging process.
+The KSQL Experimental UI release artifact is pulled from github/release into KSQL as part of the packaging process.
 
 
 

@@ -174,10 +174,6 @@ function renderTabularStatementNew(statementResponse) {
     var autoColAndRows;
     var columnHeaders, rowValues;
 
-
-    /**
-    done
-    **/
     if (statementResponse.properties) {
         columnHeaders = ['Property', 'Value'];
         rowValues = getObjectProperties(statementResponse.properties.properties);
@@ -193,6 +189,8 @@ function renderTabularStatementNew(statementResponse) {
         /**
         TODO
         **/
+
+        // look at response message formatting - i.e. table created etc.... instead of presenting json.... format nicelty
     } else if (statementResponse.error) {
         var innerBody = statementResponse.error;
         return innerBody.message;
