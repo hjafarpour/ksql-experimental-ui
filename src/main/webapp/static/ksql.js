@@ -19,6 +19,18 @@ function runCommand() {
     }
 }
 
+function displayServerVersion() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var serverVersionResponse = JSON.parse(this.responseText);
+            document.getElementById("copyright").innerHTML = "(c) Confluent Inc., KSQL server v" + serverVersionResponse.KsqlServerInfo.version
+        }
+    };
+    xhr.open("GET", "/", true);
+    xhr.send();
+}
+
 function sendRequest(resource, sqlExpression) {
     xhr.abort();
 
@@ -105,7 +117,7 @@ function renderTabular(parsedBody) {
         // The response is a list of statement responses
         var result = [];
         for (var i = 0; i < parsedBody.length; i++) {
-            result.push(renderTabularStatementNew(parsedBody[i]));
+            result.push(renderTabularStatement(parsedBody[i]));
         }
         return result.join('\n\n');
     } else if (parsedBody instanceof Object) {
@@ -169,7 +181,7 @@ function getAutoColsAndRows(object) {
     return [cols, rows];
 }
 
-function renderTabularStatementNew(statementResponse) {
+function renderTabularStatement(statementResponse) {
 
     var autoColAndRows;
     var columnHeaders, rowValues;
@@ -212,85 +224,6 @@ function renderTabularStatementNew(statementResponse) {
     }
 
 
-}
-
-function renderTabularStatement(statementResponse) {
-    var columnHeaders, rowValues;
-    if (statementResponse.currentStatus) {
-        var innerBody = statementResponse.currentStatus;
-        columnHeaders = ['Command ID', 'Status', 'Message'];
-        rowValues = [
-            [innerBody.commandId, innerBody.status, innerBody.message]
-        ];
-    } else if (statementResponse.error) {
-        var innerBody = statementResponse.error;
-        return innerBody.message;
-    } else if (statementResponse.streamsProperties) {
-        var innerBody = statementResponse.streamsProperties;
-        columnHeaders = ['Property', 'Value'];
-        rowValues = [];
-        var streamsProperties = innerBody.streamsProperties;
-        for (var property in streamsProperties) {
-            if (!streamsProperties.hasOwnProperty(property)) {
-                continue;
-            }
-            rowValues.push([property, streamsProperties[property].toString()]);
-        }
-    } else if (statementResponse.queries) {
-        var innerBody = statementResponse.queries;
-        columnHeaders = ['ID', 'Kafka Topic', 'Query String'];
-        rowValues = [];
-        var queries = innerBody.queries;
-        for (var i = 0; i < queries.length; i++) {
-            var query = queries[i];
-            rowValues.push([query.id.toString(), query.kafkaTopic, query.queryString]);
-        }
-    } else if (statementResponse.setProperty) {
-        var innerBody = statementResponse.setProperty;
-        columnHeaders = ['Property', 'Prior Value', 'New Value'];
-        rowValues = [
-            [innerBody.property, innerBody.oldValue, innerBody.newValue]
-        ];
-    } else if (statementResponse.description) {
-        var innerBody = statementResponse.description;
-        columnHeaders = ['Field', 'Type'];
-        rowValues = [];
-        var fields = innerBody.schema.fields;
-        for (var i = 0; i < fields.length; i++) {
-            var field = fields[i];
-            rowValues.push([field.field, field.type]);
-        }
-    } else if (statementResponse.streams) {
-        var innerBody = statementResponse.streams;
-        columnHeaders = ['Stream Name', 'Ksql Topic'];
-        rowValues = [];
-        var streams = innerBody.streams;
-        for (var i = 0; i < streams.length; i++) {
-            var stream = streams[i];
-            rowValues.push([stream.name, stream.topic]);
-        }
-    } else if (statementResponse.tables) {
-        var innerBody = statementResponse.tables;
-        columnHeaders = ['Table Name', 'Ksql Topic', 'Statestore', 'Windowed'];
-        rowValues = [];
-        var tables = innerBody.tables;
-        for (var i = 0; i < tables.length; i++) {
-            var table = tables[i];
-            rowValues.push([table.name, table.topic, table.stateStoreName, table.isWindowed.toString()]);
-        }
-    } else if (statementResponse.topics) {
-        var innerBody = statementResponse.topics;
-        columnHeaders = ['Topic Name', 'Kafka Topic', 'Format'];
-        rowValues = [];
-        var topics = innerBody.topics;
-        for (var i = 0; i < topics.length; i++) {
-            var topic = topics[i];
-            rowValues.push([topic.name, topic.kafkaTopic, topic.format]);
-        }
-    } else {
-        throw SyntaxError;
-    }
-    return renderTable(columnHeaders, rowValues);
 }
 
 function renderTable(columnHeaders, rowValues) {
