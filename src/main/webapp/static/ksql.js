@@ -27,7 +27,7 @@ function displayServerVersion() {
             document.getElementById("copyright").innerHTML = "(c) Confluent Inc., KSQL server v" + serverVersionResponse.KsqlServerInfo.version
         }
     };
-    xhr.open("GET", "/", true);
+    xhr.open("GET", "/info", true);
     xhr.send();
 }
 
